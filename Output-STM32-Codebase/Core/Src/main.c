@@ -57,6 +57,18 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+int readData(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, int clockDelay) {
+	int value = 0;
+
+	for(int i = 0; i < 8; i++) {
+		int readBit = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
+		value += readBit << (8 - i);
+		HAL_Delay(clockDelay);
+	}
+
+	return value;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -97,6 +109,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -208,6 +221,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : read_data_Pin */
+  GPIO_InitStruct.Pin = read_data_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(read_data_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
