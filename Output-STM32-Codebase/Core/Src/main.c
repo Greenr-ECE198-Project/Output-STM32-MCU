@@ -22,6 +22,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include <string.h>
+#include <stdio.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,15 +60,24 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+
 int readData(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, int clockDelay) {
 	int value = 0;
+	char msg[20];
 
 	for(int i = 0; i < 8; i++) {
 		int readBit = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
-		value += readBit << (8 - i);
+		value += (readBit << i);
 		HAL_Delay(clockDelay);
+
+		sprintf(msg, "%u: %u\r\n", i, readBit);
+		HAL_UART_Transmit(&huart2, (uint32_t*)msg, strlen(msg), HAL_MAX_DELAY);
 	}
 
+
+	sprintf(msg, "Value: %u\r\n", value);
+	HAL_UART_Transmit(&huart2, (uint32_t*)msg, strlen(msg), HAL_MAX_DELAY);
 	return value;
 }
 
@@ -103,12 +115,18 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  const int clockDelay = 100;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if(HAL_GPIO_ReadPin(read_data_GPIO_Port, read_data_Pin) == 1) continue;
+	  HAL_Delay(clockDelay);
+	  int dataReceived = readData(read_data_GPIO_Port, read_data_Pin, clockDelay);
+	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
 
     /* USER CODE END WHILE */
 
