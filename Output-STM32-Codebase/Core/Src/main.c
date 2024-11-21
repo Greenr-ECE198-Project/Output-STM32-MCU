@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /* USER CODE END Includes */
 
@@ -79,6 +80,24 @@ int readData(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, int clockDelay) {
 	return value;
 }
 
+bool isWithinRange(int temperature) {
+	if(20 <= temperature && temperature <= 30) return true;
+	return false;
+}
+//
+//void GetCondition(bool *condition) {
+//	if()
+//	// Read the state of a GPIO pin (BLANK)
+//	GPIO_PinState pinState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_10);  // Read pin PB10
+//
+//	// Update condition based on the pin state
+//	if (pinState == GPIO_PIN_SET) {
+//	    *condition = true;  // condition is true if PB10 is high
+//	} else {
+//    *condition = false;  // condition is false if PB10 is low
+//}
+//}
+
 /* USER CODE END 0 */
 
 /**
@@ -125,6 +144,31 @@ int main(void)
 	  HAL_Delay(clockDelay);
 	  int dataReceived = readData(read_data_GPIO_Port, read_data_Pin, clockDelay);
 	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+
+
+	  if(isWithinRange(dataReceived)) {
+          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET); // Turn on LED1
+          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // Turn off LED2
+          continue;
+	  }
+
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // Turn on LED2
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET); // Turn off LED1
+
+
+//	  bool condition1;
+//
+//
+//	          // Call the function to get updated conditions
+//	          GetConditions(*condition1);
+//
+//	          if (condition1) {
+//	              HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET); // Turn on LED1
+//	              HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // Turn off LED2
+//	          } else {
+//	          	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); // Turn on LED2
+//	              HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET); // Turn off LED1
+//	          }
 
     /* USER CODE END WHILE */
 
@@ -232,6 +276,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -250,6 +297,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB8 PB9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
