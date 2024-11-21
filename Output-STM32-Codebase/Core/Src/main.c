@@ -60,8 +60,6 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
-
 int readData(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, int clockDelay) {
 	int value = 0;
 	char msg[20];
